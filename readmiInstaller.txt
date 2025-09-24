@@ -1,0 +1,53 @@
+1. Actualiza el sistema
+	Aunque el script hace dnf -y update, es buena práctica hacerlo primero manualmente:
+	
+		sudo dnf -y update
+		sudo dnf -y upgrade
+	
+2. Instala herramientas básicas
+	El script necesita algunas utilidades para descargar, compilar y administrar paquetes:
+	
+		sudo dnf -y install wget curl git unzip tar vim policycoreutils-python-utils
+	
+	Estas herramientas son necesarias para:
+	Descargar el repo de PostgreSQL.
+	Clonar KERP desde GitHub.
+	Manipular archivos y permisos.
+	
+3. Asegúrate de tener Python 3
+	El instalador está escrito en Python 3. AlmaLinux 9 ya trae Python 3.9, pero verifica:
+	
+		python3 --version
+
+	Si no existe, instálalo:
+	
+		sudo dnf -y install python3
+	
+4. SELinux y Firewall (opcional, pero recomendado)
+
+	El script configura algunos permisos y firewall, pero debes verificar que SELinux esté activo y los puertos abiertos:
+	
+		sudo setenforce 1        # SELinux enforcing
+		sudo firewall-cmd --state # Debe estar activo
+
+5. Ejecución del instalador
+	Navega al directorio del instalador:
+	
+		cd ~/pxp_installer
+		python3 instalar_kerp.py
+
+6. Ejecuta el script con Python 3:
+	
+	python3 instalar_kerp.py
+
+7. Verificación Apache
+	Abre en tu navegador:
+		
+		http://<IP_del_servidor>/info.php
+	
+	Debes ver la información de PHP.
+
+8. Verificación servicios activos:
+
+	systemctl status httpd
+	systemctl status postgresql-14
