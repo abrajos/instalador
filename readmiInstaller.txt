@@ -34,10 +34,33 @@
 	Navega al directorio del instalador:
 	
 		cd ~/pxp_installer
-		python3 instalar_kerp.py
+
+	Si no existe el directorio, buscar en otras carpetas y migrarlas. sino crearla.
+		
+		mkdir -p ~/pxp_installer
+		cd ~/pxp_installer
+	
+	Si no se aparece crea la carpeta manualmente
+
+		sudo mkdir -p /mnt/hgfs
+		sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+
+		sudo umount /mnt/hgfs
+		sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+
+	si no existe la carpeta o no se puede ver
+
+		sudo dnf install open-vm-tools open-vm-tools-desktop -y
+	
+	Si existe  copia el file de ruta a pxp_installer
+
+		cp /mnt/hgfs/shared/instalar_kerp.py ~/pxp_installer/
+
+	
 
 6. Ejecuta el script con Python 3:
 	
+	cd ~/pxp_installer
 	python3 instalar_kerp.py
 
 7. Verificación Apache

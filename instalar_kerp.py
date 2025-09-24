@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 import subprocess
 import os
+import re
 
 def run(cmd):
     print(f"Ejecutando: {cmd}")
     subprocess.run(cmd, shell=True, check=True)
+
+def get_el_version():
+    """Detecta versión de Enterprise Linux (8 o 9)"""
+    with open("/etc/redhat-release") as f:
+        content = f.read()
+    match = re.search(r"release (\d+)", content)
+    if match:
+        return int(match.group(1))
+    else:
+        raise RuntimeError("No se pudo detectar versión de EL (8 o 9)")
 
 def update_system():
     print("🔹 Actualizando sistema...")
@@ -16,13 +27,20 @@ def install_php_apache():
 
 def install_postgres14():
     print("🔹 Instalando PostgreSQL 14...")
-    repo_url = "https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    el_version = get_el_version()
+    if el_version == 9:
+        repo_url = "https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    elif el_version == 8:
+        repo_url = "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    else:
+        raise RuntimeError(f"Versión EL {el_version} no soportada")
+
     run(f"dnf -y install {repo_url}")
     run("dnf -qy module disable postgresql")
     run("dnf -y install postgresql14 postgresql14-server postgresql14-contrib")
 
     data_dir = "/var/lib/pgsql/14/data"
-    if not os.listdir(data_dir):
+    if not os.path.exists(data_dir) or not os.listdir(data_dir):
         print("🔹 Inicializando PostgreSQL 14...")
         run("/usr/pgsql-14/bin/postgresql-14-setup initdb")
     else:
@@ -102,7 +120,7 @@ def main():
     setup_postgres_users()
     install_kerp()
     create_php_info()
-    print("✅ Instalación completa. Accede a info.php para verificar PHP.")
+    print("✅ Instalación completa. Accede a http://localhost/info.php para verificar PHP.")
 
 if __name__ == "__main__":
     main()
