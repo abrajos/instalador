@@ -15,7 +15,7 @@ def get_el_version():
     elif "9." in content:
         return 9
     else:
-        raise RuntimeError("Esta versi車n de AlmaLinux no es soportada")
+        raise RuntimeError("Esta version de AlmaLinux no es soportada")
 
 def update_system():
     print("?? Actualizando sistema...")
@@ -32,7 +32,7 @@ def setup_firewall():
     print("?? Configurando firewall...")
     run("dnf -y install firewalld")
     run("systemctl enable --now firewalld")
-    ports = [22, 80, 443, 8010]  # ?? Se quit車 5432 (PostgreSQL)
+    ports = [22, 80, 443, 8010]  # ?? Se quit穡簧 5432 (PostgreSQL)
     for port in ports:
         run(f"firewall-cmd --permanent --add-port={port}/tcp")
     run("firewall-cmd --reload")
@@ -59,7 +59,7 @@ def install_kerp():
         with open(dst, "w") as f:
             f.write(data)
 
-    # Enlaces simb車licos
+    # Enlaces simb穡簧licos
     links = {
         "/var/www/html/kerp/pxp/lib": "/var/www/html/kerp/lib",
         "/var/www/html/kerp/pxp/index.php": "/var/www/html/kerp/index.php",
@@ -93,8 +93,9 @@ def main():
     install_kerp()
     configure_selinux()
     create_php_info()
-    print("? Instalaci車n completa. Abre http://localhost/info.php para verificar PHP.")
+    print("? Instalaci穡簧n completa. Abre http://localhost/info.php para verificar PHP.")
     print("?? Recuerda que PostgreSQL no fue instalado (lo debes instalar manualmente si lo necesitas).")
 
 if __name__ == "__main__":
     main()
+
