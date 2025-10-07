@@ -1,0 +1,113 @@
+1. Actualiza el sistema
+	Aunque el script hace dnf -y update, es buena práctica hacerlo primero manualmente:
+	
+		sudo dnf -y update
+		sudo dnf -y upgrade
+	
+2. Instala herramientas básicas
+	El script necesita algunas utilidades para descargar, compilar y administrar paquetes:
+	
+		sudo dnf -y install wget curl git unzip tar vim policycoreutils-python-utils
+	
+	Estas herramientas son necesarias para:
+	Descargar el repo de PostgreSQL.
+	Clonar KERP desde GitHub.
+	Manipular archivos y permisos.
+	
+3. Asegúrate de tener Python 3
+	El instalador está escrito en Python 3. AlmaLinux 9 ya trae Python 3.9, pero verifica:
+	
+		python3 --version
+
+	Si no existe, instálalo:
+	
+		sudo dnf -y install python3
+	
+4. SELinux y Firewall (opcional, pero recomendado)
+
+	El script configura algunos permisos y firewall, pero debes verificar que SELinux esté activo y los puertos abiertos:
+	
+		sudo setenforce 1        # SELinux enforcing
+		sudo firewall-cmd --state # Debe estar activo
+
+5. Ejecución del instalador
+	Navega al directorio del instalador:
+	
+		cd ~/pxp_installer
+
+	Si no existe el directorio, buscar en otras carpetas y migrarlas. sino crearla.
+		
+		mkdir -p ~/pxp_installer
+		cd ~/pxp_installer
+	
+	Si no se aparece crea la carpeta manualmente
+
+		sudo mkdir -p /mnt/hgfs
+		sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+
+		sudo umount /mnt/hgfs
+		sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+
+	si no existe la carpeta o no se puede ver
+
+		sudo dnf install open-vm-tools open-vm-tools-desktop -y
+	
+	Si existe  copia el file de ruta a pxp_installer
+
+		cp /mnt/hgfs/shared/instalar_eight_pxp.py ~/pxp_installer/
+
+
+6. Ejecuta el script con Python 3:
+	
+	cd ~/pxp_installer
+	python3 instalar_eight_pxp.py
+
+7. Verificación Apache
+	Abre en tu navegador:
+		
+		http://<IP_del_servidor>/info.php
+	
+	Debes ver la información de PHP.
+
+8. Verificación servicios activos:
+
+	systemctl status httpd
+	
+9. Instalar postgresql 12
+	Instala las dependencias necesarias para compilar:
+	
+		sudo dnf groupinstall "Development Tools" -y
+		sudo dnf install -y readline-devel zlib-devel bison flex wget gcc make perl	
+	
+	Ve a la carpeta donde quieres descargar el código:
+	
+		cd /usr/local/src
+		sudo wget https://ftp.postgresql.org/pub/source/v12.14/postgresql-12.14.tar.gz
+		sudo tar -xvzf postgresql-12.14.tar.gz
+		cd postgresql-12.14
+		
+	Compilar y configurar
+	
+		cd /usr/local/src/postgresql-12.14
+		./configure --prefix=/usr/local/pgsql12 --with-openssl --with-libxml --with-libxslt
+		
+	Debes hacer:
+		
+		./configure --prefix=/usr/local/pgsql12 --with-openssl --with-libxml --with-libxslt
+		make
+		sudo make install
+		
+	crear directorio manuelmante antes de instalar:
+	
+		sudo useradd postgres12
+		sudo mkdir -p /usr/local/pgsql12/data
+		sudo chown -R postgres12:postgres12 /usr/local/pgsql12
+	
+	Iniciallizar la Base de datos
+	
+		sudo su - postgres12
+		/usr/local/pgsql12/bin/initdb -D /usr/local/pgsql12/data
+
+
+		
+
